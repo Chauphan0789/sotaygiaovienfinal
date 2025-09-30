@@ -1,12 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 import { Student, LogEntry, LogCategory } from '../types';
 
-if (!process.env.API_KEY) {
-  // This is a placeholder for deployment. In Netlify, you'll set the API_KEY as an environment variable.
-  console.info("API_KEY will be provided by the deployment environment.");
+// In a Vite project, environment variables are accessed via import.meta.env
+const apiKey = import.meta.env.VITE_API_KEY;
+
+if (!apiKey) {
+  // This message will show in the browser console if the key is missing on Netlify
+  console.error("VITE_API_KEY is not set in the Netlify environment variables.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
 export const getAISuggestion = async (student: Student, logEntry: LogEntry, recentLogs: LogEntry[]): Promise<string> => {
   try {
@@ -59,7 +62,7 @@ export const getAISuggestion = async (student: Student, logEntry: LogEntry, rece
     return response.text;
   } catch (error) {
     console.error("Error calling Gemini API:", error);
-    return "Đã xảy ra lỗi khi kết nối với AI. Vui lòng thử lại sau.";
+    return "Đã xảy ra lỗi khi kết nối với AI. Vui lòng kiểm tra lại API Key trên Netlify và thử lại.";
   }
 };
 
@@ -102,6 +105,6 @@ export const getAIStudentSummary = async (student: Student, allLogs: LogEntry[])
     return response.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\* (.*?)(?=\n\*|\n\n|$)/g, '<li>$1</li>');
   } catch (error) {
     console.error("Error calling Gemini API:", error);
-    return "Đã xảy ra lỗi khi kết nối với AI. Vui lòng thử lại sau.";
+    return "Đã xảy ra lỗi khi kết nối với AI. Vui lòng kiểm tra lại API Key trên Netlify và thử lại.";
   }
 };
